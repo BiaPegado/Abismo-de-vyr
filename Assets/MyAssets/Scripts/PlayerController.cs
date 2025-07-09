@@ -3,18 +3,24 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float speed = 0f;
-
     private Rigidbody2D rb;
     private Animator anim;
 
-    [SerializeField]  private float jumpForce;
+    [Header("Player Stats")]
+    [SerializeField] private float jumpForce;
+    [SerializeField] private int maxHealth = 200;
+    [SerializeField] private float speed = 0f;
+    private int currentHealth;
 
     [Header("Collision Check")]
     [SerializeField] private float groundCheckRadius;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask isGround;
     private bool groundDetected;
+
+    [Header("Particles")]
+    [SerializeField] private ParticleSystem damageParticles;
+    private ParticleSystem damageParticlesInstance;
 
     private bool isFacingRight = true;
 
@@ -23,6 +29,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        currentHealth = maxHealth;
     }
 
     // Update is called once per frame
@@ -36,9 +43,10 @@ public class PlayerController : MonoBehaviour
         FlipController();
         CollisionChecks();
 
-        rb.linearVelocity = new Vector2(h * speed, rb.linearVelocity.y); // Para jogos de plataforma
+        rb.linearVelocity = new Vector2(h * speed, rb.linearVelocity.y); 
 
-        if (Input.GetKeyDown(KeyCode.Z)) Jump();
+        if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Period)) Jump();
+        if (Input.GetKeyUp(KeyCode.Z) && rb.linearVelocity.y > 0) rb.linearVelocity = new Vector2(rb.linearVelocity.x, (rb.linearVelocity.y * 0.5f));
 
     }
 
@@ -80,6 +88,36 @@ public class PlayerController : MonoBehaviour
     public void CollisionChecks()
     {
         groundDetected = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, isGround);
+    }
+    public void TakeDamage(int damage, Vector2 attackDirection)
+    {
+        currentHealth -= damage;
+        anim.SetTrigger("Hurt");
+        SpawnDamageParticles(attackDirection);
+        if (currentHealth < 0)
+        {
+            Die();
+        }
+    }
+
+    public void Knockback(float force, Vector2 direction)
+    {
+        rb.linearVelocity = Vector2.zero;
+        rb.AddForce(direction.normalized * force, ForceMode2D.Impulse);
+    }
+
+    void Die()
+    {
+        anim.SetTrigger("isDead");
+        gameObject.layer = LayerMask.NameToLayer("Ui");
+        this.enabled = false;
+        Debug.Log("Game over!");
+    }
+
+    private void SpawnDamageParticles(Vector2 attackDirection)
+    {
+        Quaternion rotation = Quaternion.FromToRotation(Vector2.left, attackDirection);
+        damageParticlesInstance = Instantiate(damageParticles, transform.position, rotation);
     }
 
 }

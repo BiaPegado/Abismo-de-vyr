@@ -6,6 +6,9 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     private Animator anim;
 
+    [Header("UI")]
+    public GameObject deathScreenPanel;
+
     [Header("Player Stats")]
     [SerializeField] private float jumpForce;
     [SerializeField] private int maxHealth = 200;
@@ -130,6 +133,15 @@ public class PlayerController : MonoBehaviour
         gameObject.layer = LayerMask.NameToLayer("Ui");
         this.enabled = false;
         Debug.Log("Game over!");
+
+        // Ativa a tela de morte
+        if (deathScreenPanel != null)
+        {
+            deathScreenPanel.SetActive(true);
+        }
+
+        // Pausa o jogo
+        Time.timeScale = 0f;
     }
 
     private void SpawnDamageParticles(Vector2 attackDirection)

@@ -12,6 +12,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float speed = 0f;
     private int currentHealth;
 
+    // Referência para a UI da Barra de Vida
+    public HealthBar healthBar;
+
     [Header("Collision Check")]
     [SerializeField] private float groundCheckRadius;
     [SerializeField] private Transform groundCheck;
@@ -30,6 +33,12 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         currentHealth = maxHealth;
+        
+        //Configura a vida máxima na barra de vida quando o jogo começa
+        if (healthBar != null)
+        {
+            healthBar.SetMaxHealth(maxHealth);
+        }
     }
 
     // Update is called once per frame
@@ -92,10 +101,19 @@ public class PlayerController : MonoBehaviour
     public void TakeDamage(int damage, Vector2 attackDirection)
     {
         currentHealth -= damage;
+        
+        // Atualiza o valor visual na barra de vida
+        if (healthBar != null)
+        {
+            healthBar.SetHealth(currentHealth);
+        }
+
         anim.SetTrigger("Hurt");
         SpawnDamageParticles(attackDirection);
-        if (currentHealth < 0)
+
+        if (currentHealth <= 0)
         {
+            currentHealth = 0; // Garante que não exiba vida negativa
             Die();
         }
     }
@@ -132,7 +150,7 @@ rb.AddForce(new Vector2(rb.linearVelocity.x, jump * 5)); // Para jogos de plataf
 //rb.linearVelocity = new Vector2(h*speed, v*speed); //Desligar gravidade
 
 /* 
- * Adiciona uma "for�a" no player
+ * Adiciona uma "for�a" no player
 rb.AddForce(new Vector2(h, v));
 */
 /*

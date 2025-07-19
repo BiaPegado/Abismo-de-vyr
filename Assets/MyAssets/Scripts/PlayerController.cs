@@ -6,11 +6,17 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     private Animator anim;
 
+    [Header("UI")]
+    public GameObject deathScreenPanel;
+
     [Header("Player Stats")]
     [SerializeField] private float jumpForce;
     [SerializeField] private int maxHealth = 200;
     [SerializeField] private float speed = 0f;
     private int currentHealth;
+
+    // Referência para a UI da Barra de Vida
+    public HealthBar healthBar;
 
     [Header("Collision Check")]
     [SerializeField] private float groundCheckRadius;
@@ -30,6 +36,12 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         currentHealth = maxHealth;
+        
+        //Configura a vida máxima na barra de vida quando o jogo começa
+        if (healthBar != null)
+        {
+            healthBar.SetMaxHealth(maxHealth);
+        }
     }
 
     // Update is called once per frame
@@ -92,10 +104,19 @@ public class PlayerController : MonoBehaviour
     public void TakeDamage(int damage, Vector2 attackDirection)
     {
         currentHealth -= damage;
+        
+        // Atualiza o valor visual na barra de vida
+        if (healthBar != null)
+        {
+            healthBar.SetHealth(currentHealth);
+        }
+
         anim.SetTrigger("Hurt");
         SpawnDamageParticles(attackDirection);
-        if (currentHealth < 0)
+
+        if (currentHealth <= 0)
         {
+            currentHealth = 0; // Garante que não exiba vida negativa
             Die();
         }
     }
@@ -112,6 +133,15 @@ public class PlayerController : MonoBehaviour
         gameObject.layer = LayerMask.NameToLayer("Ui");
         this.enabled = false;
         Debug.Log("Game over!");
+
+        // Ativa a tela de morte
+        if (deathScreenPanel != null)
+        {
+            deathScreenPanel.SetActive(true);
+        }
+
+        // Pausa o jogo
+        Time.timeScale = 0f;
     }
 
     private void SpawnDamageParticles(Vector2 attackDirection)
@@ -132,7 +162,7 @@ rb.AddForce(new Vector2(rb.linearVelocity.x, jump * 5)); // Para jogos de plataf
 //rb.linearVelocity = new Vector2(h*speed, v*speed); //Desligar gravidade
 
 /* 
- * Adiciona uma "for�a" no player
+ * Adiciona uma "for�a" no player
 rb.AddForce(new Vector2(h, v));
 */
 /*

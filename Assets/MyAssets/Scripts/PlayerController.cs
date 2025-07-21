@@ -104,7 +104,6 @@ public class PlayerController : MonoBehaviour
     public void TakeDamage(int damage, Vector2 attackDirection)
     {
         currentHealth -= damage;
-        
         // Atualiza o valor visual na barra de vida
         if (healthBar != null)
         {

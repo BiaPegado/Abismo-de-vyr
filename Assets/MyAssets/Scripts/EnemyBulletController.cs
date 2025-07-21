@@ -6,7 +6,7 @@ public class EnemyBulletController : MonoBehaviour
     private Vector2 moveDirection;
 
     [SerializeField] private float speed = 5f;
-    [SerializeField] private int attackDamage;
+    [SerializeField] public int attackDamage;
 
     private float timer;
 

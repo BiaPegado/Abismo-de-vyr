@@ -21,6 +21,7 @@ public class MageController : EnemyController
     {
         base.Start();
         patrolDestination = -1;
+        enemyShooter.damage = attackDamage;
     }
 
     protected override void Update()

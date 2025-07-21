@@ -5,6 +5,7 @@ public class EnemyShooter : MonoBehaviour
     [SerializeField] private GameObject bullet;
     [SerializeField] private Transform bulletPos;
     private GameObject player;
+    public int damage;
 
     private void Start()
     {
@@ -18,7 +19,7 @@ public class EnemyShooter : MonoBehaviour
 
     public void ShotgunBlast()
     {
-        float[] angles = { -22f, 0f, 22f }; // Espalhamento
+        float[] angles = { -33f, 0f, 33f }; // Espalhamento
 
         foreach (float angle in angles)
         {
@@ -44,7 +45,9 @@ public class EnemyShooter : MonoBehaviour
         EnemyBulletController bulletController = newBullet.GetComponent<EnemyBulletController>();
         if (bulletController != null)
         {
+            bulletController.attackDamage = damage;
             bulletController.SetTarget(targetPosition);
         }
     }
+    
 }
